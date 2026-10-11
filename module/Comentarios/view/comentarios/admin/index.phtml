@@ -1,0 +1,23 @@
+<h1>Administración de Comentarios</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th><th>Autor</th><th>Contenido</th><th>Estado</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($comentarios as $c): ?>
+        <tr>
+            <td><?= $c->id ?></td>
+            <td><?= $this->escapeHtml($c->autor) ?></td>
+            <td><?= $this->escapeHtml($c->contenido) ?></td>
+            <td><?= $c->estado ?></td>
+            <td>
+                <a href="<?= $this->url('comentarios-admin', ['action'=>'aprobar','id'=>$c->id]) ?>">Aprobar</a> |
+                <a href="<?= $this->url('comentarios-admin', ['action'=>'editar','id'=>$c->id]) ?>">Editar</a> |
+                <a href="<?= $this->url('comentarios-admin', ['action'=>'eliminar','id'=>$c->id]) ?>">Eliminar</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>

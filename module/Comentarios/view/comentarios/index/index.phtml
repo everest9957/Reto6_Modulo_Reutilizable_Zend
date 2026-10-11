@@ -1,0 +1,16 @@
+<h1>Comentarios</h1>
+<p><a href="<?= $this->url('comentarios', ['action' => 'crear']) ?>" class="btn btn-success">Nuevo comentario</a></p>
+<hr>
+<?php if (count($comentarios) === 0): ?>
+    <p>No hay comentarios aprobados todavía.</p>
+<?php else: ?>
+    <?php foreach ($comentarios as $c): ?>
+        <div class="comentario card mb-3">
+            <div class="card-body">
+                <strong><?= $this->escapeHtml($c->autor) ?></strong>
+                <small class="text-muted"><?= $this->escapeHtml($c->fecha_creacion) ?></small>
+                <p><?= $this->escapeHtml($c->contenido) ?></p>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>

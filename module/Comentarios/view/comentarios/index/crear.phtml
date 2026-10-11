@@ -1,0 +1,12 @@
+<h1>Nuevo Comentario</h1>
+<?php
+$form = $this->form;
+$form->prepare();
+echo $this->form()->openTag($form);
+echo $this->formRow($form->get('post_id'));
+echo $this->formRow($form->get('autor'));
+echo $this->formRow($form->get('email'));
+echo $this->formRow($form->get('contenido'));
+echo $this->formSubmit($form->get('submit'));
+echo $this->form()->closeTag();
+?>

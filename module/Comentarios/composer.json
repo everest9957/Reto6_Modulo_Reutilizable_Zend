@@ -1,0 +1,24 @@
+{
+    "name": "codigo-samurai/comentarios-module",
+    "description": "Módulo reutilizable de comentarios para Zend Framework",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tu Nombre",
+            "email": "tu@email.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "zendframework/zend-mvc": "^3.1",
+        "zendframework/zend-db": "^2.11",
+        "zendframework/zend-form": "^2.14",
+        "zendframework/zend-hydrator": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Comentarios\\": "src/"
+        }
+    }
+}

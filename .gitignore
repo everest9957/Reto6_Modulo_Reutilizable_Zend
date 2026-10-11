@@ -1,0 +1,31 @@
+cd C:\Users\jdthg\Documents\cursoDesarrolloWebFrameworks6\Reto6_Modulo_Reutilizable_Zend
+
+$gitignore = @'
+# Dependencias de Composer
+/vendor/
+composer.lock
+
+# Esqueleto de prueba (no se sube)
+/laminas-skeleton-test/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Caché
+/data/cache/
+'@
+
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText("$PWD\.gitignore", $gitignore, $utf8NoBom)
+
+Write-Host "✅ .gitignore creado" -ForegroundColor Green
+Get-Content .gitignore
