@@ -41,7 +41,7 @@ text
 comunidad. Los namespaces `Zend\` pasan a `Laminas\` y la arquitectura
 es idéntica.
 
-**Captura:** `15_1_laminas_instalado.png`
+![Captura](capturas/15_1_laminas_instalado.png)
 
 ---
 
@@ -61,9 +61,10 @@ text
 
 ```powershell
 composer create-project -s dev laminas/laminas-mvc-skeleton laminas-skeleton-test --ignore-platform-reqs
+```
 También se debe usar el mismo flag al instalar paquetes adicionales.
 
-Captura: 15_10c_composer_require_form_db.png
+![Captura](capturas/15_10c_composer_require_form_db.png)
 
 3. Error post-create: remove-package-artifacts.php
 Síntoma:
@@ -91,7 +92,7 @@ namespace.
 
 Solución: Editar module/Comentarios/config/module.config.php:
 
-php
+```php
 // Zend Framework 2
 'service_manager' => [
     'factories' => [...],
@@ -101,7 +102,8 @@ php
 'dependencies' => [
     'factories' => [...],
 ],
-Captura: 15_5_module_config_laminas.png
+```
+![Captura](capturas/15_5_module_config_laminas.png)
 
 5. composer.json con 4 barras en PSR-4
 Síntoma: El autoloader no encontraba las clases del módulo:
@@ -121,7 +123,7 @@ reemplazo automático que duplicó las barras.
 Solución: Reescribir la sección autoload del composer.json con
 exactamente dos barras:
 
-json
+```json
 "autoload": {
     "psr-4": {
         "Application\\": "module/Application/src/",
@@ -136,7 +138,7 @@ Capturas: 15_10q_composer_json_corregido.png, 15_10r_composer_validate.png
 
 6. BOM UTF-8 en archivos PHP
 Síntoma: Mensajes de Composer:
-
+```
 text
 Class Comentarios\Controller\AdminController located in ./module/Comentarios/src/Controller/AdminController.php
 does not comply with psr-4 autoloading standard (rule: Comentarios\\ => ./module/Comentarios/src). Skipping.
@@ -149,7 +151,7 @@ Esto ocurre al usar Set-Content -Encoding UTF8 en Windows PowerShell
 
 Solución: Eliminar el BOM con un script PowerShell:
 
-powershell
+```powershell
 Get-ChildItem -Path module\Comentarios -Recurse -Filter *.php | ForEach-Object {
     $content = [System.IO.File]::ReadAllText($_.FullName)
     if ($content.Length -gt 0 -and $content[0] -eq [char]0xFEFF) {
@@ -159,7 +161,7 @@ Get-ChildItem -Path module\Comentarios -Recurse -Filter *.php | ForEach-Object {
     [System.IO.File]::WriteAllText($_.FullName, $content, $utf8NoBom)
 }
 Capturas: 15_10t_bom_detectado.png, 15_10u_bom_eliminado.png, 15_10v_sin_bom.png
-
+```
 7. use Interop\Container\ContainerInterface
 Síntoma: El error del ServiceManager:
 
@@ -185,17 +187,18 @@ Solución: Reemplazar en los tres factories
 (ComentarioTableFactory.php, IndexControllerFactory.php,
 AdminControllerFactory.php):
 
-php
+```php
 // Antes
 use Interop\Container\ContainerInterface;
 
 // Después
 use Psr\Container\ContainerInterface;
-
+```
 Verificar con:
 
-powershell
+```powershell
 Get-ChildItem module\Comentarios -Recurse -Filter *.php | Select-String "Interop"
+```
 # No debe devolver nada
 8. Module.php con AutoloaderProviderInterface
 Síntoma: La configuración del módulo no se registraba correctamente
@@ -210,7 +213,7 @@ rompe la fusión de configuración en el ServiceManager.
 Solución: Simplificar el Module.php eliminando todo lo relativo a
 autoload (Composer ya se encarga):
 
-php
+```php
 <?php
 namespace Comentarios;
 
@@ -223,7 +226,8 @@ class Module implements ConfigProviderInterface
         return include __DIR__ . '/../config/module.config.php';
     }
 }
-Captura: 15_10y_module_php_corregido.png
+```
+![Captura](capturas/15_10y_module_php_corregido.png)
 
 9. Referencias Zend\ residuales
 Síntoma: Errores de "Class not found" para clases Zend\... al
@@ -235,8 +239,9 @@ Zend\ModuleManager\Feature\....
 
 Solución: Verificar y limpiar todas las referencias residuales:
 
-powershell
+```powershell
 Get-ChildItem module\Comentarios -Recurse -Filter *.php | Select-String "Zend"
+```
 # No debe devolver nada
 Si devuelve algo, reemplazar con:
 
@@ -247,7 +252,7 @@ Get-ChildItem module\Comentarios -Recurse -Filter *.php | ForEach-Object {
     $content = $content -replace 'Zend/', 'Laminas/'
     [System.IO.File]::WriteAllText($_.FullName, $content, (New-Object System.Text.UTF8Encoding($false)))
 }
-Captura: 15_10z_sin_zend.png
+![Captura](capturas/15_10z_sin_zend.png)
 
 10. Caché de configuración de Laminas
 Síntoma: Tras corregir module.config.php o Module.php, el
@@ -261,7 +266,7 @@ leyendo la config vieja.
 
 Solución: Rutina obligatoria tras cada cambio de configuración:
 
-powershell
+````powershell
 # 1. Limpiar caché
 Remove-Item -Path "data\cache\*" -Recurse -Force -ErrorAction SilentlyContinue
 
@@ -270,9 +275,9 @@ composer dump-autoload -o
 
 # 3. Reiniciar el servidor (Ctrl + C y volver a arrancar)
 php -S localhost:8888 -t public
-
+```
 # 4. En el navegador: Ctrl + Shift + R (recarga forzada)
-Captura: 15_10w_dump_autoload_ok.png
+![Captura](capturas/15_10w_dump_autoload_ok.png)
 
 11. dependencies no se fusiona con service_manager
 Síntoma: La configuración fusionada sí mostraba
@@ -282,7 +287,7 @@ tenía 52 factories y ninguna de Comentarios.
 
 Esto se confirmó con un diagnóstico detallado:
 
-text
+```text
 5. Config fusionada:
    dependencies.factories:
      - Comentarios\Model\ComentarioTable         ← ✅
@@ -296,8 +301,8 @@ nivel del ServiceManager raíz cuando se carga desde módulos. Las
 factories quedan solo en la config, no en la lista interna del SM.
 
 Solución: Registrar las factories en ambas claves:
-
-php
+```
+```php
 'service_manager' => [
     'factories' => [
         Model\ComentarioTable::class => Model\ComentarioTableFactory::class,
@@ -308,6 +313,7 @@ php
         Model\ComentarioTable::class => Model\ComentarioTableFactory::class,
     ],
 ],
+```
 12. Acentos corruptos en la BD
 Síntoma: En el navegador aparecía Ana L?pez, art?culo,
 Mar?a P?rez.
